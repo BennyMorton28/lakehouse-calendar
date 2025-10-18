@@ -2,6 +2,13 @@
 
 A beautiful, mobile-first web app for coordinating family weekends at the lake house. Built with React, Tailwind CSS, and Supabase.
 
+## 🚀 Quick Links
+
+- **[Quick Start Guide](./QUICKSTART.md)** - Get up and running in 10 minutes
+- **[Deployment Guide](./DEPLOYMENT.md)** - Detailed deployment instructions
+- **[Features Overview](./FEATURES.md)** - Complete feature list and technical details
+- **[Supabase Setup](./SUPABASE_SETUP.md)** - Database configuration guide
+
 ## Features
 
 - **Mobile-First Design**: Optimized for phones and tablets with large touch targets
