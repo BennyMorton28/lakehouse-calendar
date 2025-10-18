@@ -36,28 +36,33 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
 
   const renderHeader = () => {
     return (
-      <div className="flex items-center justify-between mb-6 bg-white rounded-lg shadow-sm p-4">
+      <div className="flex items-center justify-between mb-8">
         <button
           onClick={handlePrevMonth}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors touch-manipulation"
+          className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/80 backdrop-blur-sm hover:bg-white shadow-md hover:shadow-lg transition-all duration-200 touch-manipulation group"
           aria-label="Previous month"
         >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
-        <h2 className="text-xl md:text-2xl font-bold text-gray-800">
-          {format(currentMonth, 'MMMM yyyy')}
-        </h2>
+        <div className="text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+            {format(currentMonth, 'MMMM')}
+          </h2>
+          <p className="text-sm md:text-base text-gray-500 font-medium mt-1">
+            {format(currentMonth, 'yyyy')}
+          </p>
+        </div>
 
         <button
           onClick={handleNextMonth}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors touch-manipulation"
+          className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/80 backdrop-blur-sm hover:bg-white shadow-md hover:shadow-lg transition-all duration-200 touch-manipulation group"
           aria-label="Next month"
         >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          <svg className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
           </svg>
         </button>
       </div>
@@ -67,9 +72,9 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
   const renderDays = () => {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     return (
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-2 md:gap-3 mb-3">
         {days.map((day, i) => (
-          <div key={i} className="text-center font-semibold text-gray-600 text-sm py-2">
+          <div key={i} className="text-center font-bold text-gray-500 text-xs md:text-sm py-3 uppercase tracking-wider">
             {day}
           </div>
         ))}
@@ -99,11 +104,12 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
           <div
             key={day}
             className={`
-              min-h-[70px] md:min-h-[90px] p-2 border border-gray-200 rounded-lg
-              transition-all touch-manipulation
-              ${isCurrentMonth ? 'bg-white' : 'bg-gray-50'}
-              ${isWeekendDay && isCurrentMonth ? 'cursor-pointer hover:shadow-md hover:scale-[1.02]' : 'cursor-default'}
-              ${isToday ? 'ring-2 ring-blue-400' : ''}
+              relative min-h-[90px] md:min-h-[110px] p-3 md:p-4 rounded-xl
+              transition-all duration-300 touch-manipulation overflow-hidden group
+              ${isCurrentMonth ? 'bg-white shadow-sm' : 'bg-gray-50/50'}
+              ${isWeekendDay && isCurrentMonth ? 'cursor-pointer hover:shadow-xl hover:scale-[1.03] hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50' : 'cursor-default'}
+              ${isToday ? 'ring-2 ring-blue-500 shadow-lg' : ''}
+              ${!isCurrentMonth ? 'opacity-40' : ''}
             `}
             onClick={() => {
               if (isWeekendDay && isCurrentMonth) {
@@ -111,48 +117,72 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
               }
             }}
           >
-            <div className="flex flex-col h-full">
-              <span className={`
-                text-sm md:text-base font-medium mb-1
-                ${!isCurrentMonth ? 'text-gray-400' : isToday ? 'text-blue-600 font-bold' : 'text-gray-700'}
-              `}>
-                {format(day, 'd')}
-              </span>
+            {/* Subtle gradient overlay for weekends */}
+            {isWeekendDay && isCurrentMonth && (
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            )}
+
+            <div className="relative flex flex-col h-full">
+              <div className="flex items-center justify-between mb-2">
+                <span className={`
+                  text-base md:text-lg font-bold
+                  ${!isCurrentMonth ? 'text-gray-400' : isToday ? 'text-blue-600' : 'text-gray-800'}
+                `}>
+                  {format(day, 'd')}
+                </span>
+
+                {isToday && (
+                  <span className="px-2 py-0.5 text-xs font-bold text-white bg-blue-500 rounded-full">
+                    Today
+                  </span>
+                )}
+              </div>
 
               {isWeekendDay && isCurrentMonth && totalInterest > 0 && (
-                <div className="flex-1 flex flex-col gap-1">
+                <div className="flex-1 flex flex-col gap-2">
                   {/* Interest indicators */}
-                  <div className="flex flex-wrap gap-1">
-                    {interests.slice(0, 3).map((interest, idx) => {
+                  <div className="flex flex-wrap gap-1.5">
+                    {interests.slice(0, 4).map((interest, idx) => {
                       const member = FAMILY_MEMBERS.find(m => m.name === interest.person_name)
                       return (
                         <div
                           key={idx}
-                          className="w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm"
+                          className="relative w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md hover:scale-110 transition-transform"
                           style={{ backgroundColor: member?.color || '#gray' }}
                           title={`${interest.person_name} - ${interest.status}`}
                         >
                           {interest.person_name[0]}
+                          {interest.status === 'confirmed' && (
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white">
+                              <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
                         </div>
                       )
                     })}
-                    {interests.length > 3 && (
-                      <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs font-bold">
-                        +{interests.length - 3}
+                    {interests.length > 4 && (
+                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                        +{interests.length - 4}
                       </div>
                     )}
                   </div>
 
-                  {/* Status counts */}
-                  <div className="text-xs text-gray-600 mt-auto">
+                  {/* Status summary bar */}
+                  <div className="flex items-center gap-2 mt-auto">
                     {confirmedCount > 0 && (
-                      <div className="font-semibold text-green-600">
-                        ✓ {confirmedCount}
+                      <div className="flex items-center gap-1 px-2 py-1 bg-green-100 rounded-lg">
+                        <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs font-bold text-green-700">{confirmedCount}</span>
                       </div>
                     )}
                     {tentativeCount > 0 && (
-                      <div className="text-amber-600">
-                        ? {tentativeCount}
+                      <div className="flex items-center gap-1 px-2 py-1 bg-amber-100 rounded-lg">
+                        <span className="text-xs font-bold text-amber-700">?</span>
+                        <span className="text-xs font-bold text-amber-700">{tentativeCount}</span>
                       </div>
                     )}
                   </div>
@@ -166,7 +196,7 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
       }
 
       rows.push(
-        <div key={day} className="grid grid-cols-7 gap-1 md:gap-2 mb-1 md:mb-2">
+        <div key={day} className="grid grid-cols-7 gap-2 md:gap-3 mb-2 md:mb-3">
           {days}
         </div>
       )
@@ -177,22 +207,35 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+    <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8 border border-white/20">
       {renderHeader()}
       {renderDays()}
       {renderCells()}
 
       {/* Legend */}
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <div className="text-sm text-gray-600 mb-2 font-semibold">Legend:</div>
-        <div className="flex flex-wrap gap-3 text-xs">
-          <div className="flex items-center gap-1">
-            <span className="text-green-600 font-bold">✓</span>
-            <span>Confirmed</span>
+      <div className="mt-8 pt-6 border-t border-gray-200/50">
+        <div className="flex flex-wrap items-center justify-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+              <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <span className="text-sm font-semibold text-gray-700">Confirmed</span>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="text-amber-600 font-bold">?</span>
-            <span>Tentative</span>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+              <span className="text-amber-600 font-bold">?</span>
+            </div>
+            <span className="text-sm font-semibold text-gray-700">Tentative</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              </svg>
+            </div>
+            <span className="text-sm font-semibold text-gray-700">Tap to add</span>
           </div>
         </div>
       </div>
