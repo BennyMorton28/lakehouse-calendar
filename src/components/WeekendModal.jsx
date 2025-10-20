@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 import { FAMILY_MEMBERS } from '../App'
 
 const WeekendModal = ({ date, onClose, weekendInterests, onUpdate }) => {
-  const [selectedPerson, setSelectedPerson] = useState('')
+  const [selectedPeople, setSelectedPeople] = useState([])
   const [status, setStatus] = useState('tentative')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
@@ -13,39 +13,52 @@ const WeekendModal = ({ date, onClose, weekendInterests, onUpdate }) => {
   const displayDate = format(date, 'EEEE, MMMM d, yyyy')
   const currentInterests = weekendInterests.filter(interest => interest.weekend_date === dateStr)
 
+  const togglePerson = (personName) => {
+    setSelectedPeople(prev =>
+      prev.includes(personName)
+        ? prev.filter(name => name !== personName)
+        : [...prev, personName]
+    )
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!selectedPerson) return
+    if (selectedPeople.length === 0) return
 
     setSaving(true)
     try {
-      const existingInterest = currentInterests.find(i => i.person_name === selectedPerson)
+      // Insert or update for each selected person
+      for (const personName of selectedPeople) {
+        const existingInterest = currentInterests.find(i => i.person_name === personName)
 
-      if (existingInterest) {
-        const { error } = await supabase
-          .from('weekend_interests')
-          .update({
-            status,
-            notes,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingInterest.id)
+        if (existingInterest) {
+          // Update existing entry
+          const { error } = await supabase
+            .from('weekend_interests')
+            .update({
+              status,
+              notes,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingInterest.id)
 
-        if (error) throw error
-      } else {
-        const { error } = await supabase
-          .from('weekend_interests')
-          .insert([{
-            weekend_date: dateStr,
-            person_name: selectedPerson,
-            status,
-            notes
-          }])
+          if (error) throw error
+        } else {
+          // Insert new entry
+          const { error } = await supabase
+            .from('weekend_interests')
+            .insert([{
+              weekend_date: dateStr,
+              person_name: personName,
+              status,
+              notes
+            }])
 
-        if (error) throw error
+          if (error) throw error
+        }
       }
 
-      setSelectedPerson('')
+      setSelectedPeople([])
       setStatus('tentative')
       setNotes('')
       onUpdate()
@@ -186,32 +199,66 @@ const WeekendModal = ({ date, onClose, weekendInterests, onUpdate }) => {
               <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
               </svg>
-              Add Someone
+              Add People
             </h3>
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Person Selector */}
+              {/* Multi-Person Selector */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Who wants to go?
+                <label className="block text-sm font-bold text-gray-700 mb-3">
+                  Who wants to go? (select multiple)
                 </label>
-                <div className="relative">
-                  <select
-                    value={selectedPerson}
-                    onChange={(e) => setSelectedPerson(e.target.value)}
-                    className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium touch-manipulation appearance-none cursor-pointer"
-                    required
-                  >
-                    <option value="">Choose a family member...</option>
-                    {FAMILY_MEMBERS.map((member) => (
-                      <option key={member.name} value={member.name}>
-                        {member.name}
-                      </option>
-                    ))}
-                  </select>
-                  <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                <div className="grid grid-cols-2 gap-3">
+                  {FAMILY_MEMBERS.map((member) => {
+                    const isSelected = selectedPeople.includes(member.name)
+                    const alreadyAdded = currentInterests.some(i => i.person_name === member.name)
+
+                    return (
+                      <button
+                        key={member.name}
+                        type="button"
+                        onClick={() => togglePerson(member.name)}
+                        disabled={alreadyAdded}
+                        className={`
+                          relative p-4 rounded-xl font-bold transition-all touch-manipulation flex items-center gap-3
+                          ${isSelected
+                            ? 'bg-white shadow-lg ring-2 scale-105'
+                            : alreadyAdded
+                            ? 'bg-gray-100 opacity-50 cursor-not-allowed'
+                            : 'bg-white hover:shadow-md hover:scale-102'
+                          }
+                        `}
+                        style={{
+                          ringColor: isSelected ? member.color : 'transparent'
+                        }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold shadow-md flex-shrink-0"
+                          style={{ backgroundColor: member.color }}
+                        >
+                          {member.name[0]}
+                        </div>
+                        <span className={`text-left flex-1 ${isSelected ? 'text-gray-900' : 'text-gray-700'}`}>
+                          {member.name}
+                        </span>
+                        {isSelected && (
+                          <svg className="w-5 h-5 flex-shrink-0" style={{ color: member.color }} fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        {alreadyAdded && (
+                          <span className="text-xs text-gray-500">Added</span>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
+                {selectedPeople.length > 0 && (
+                  <div className="mt-3 p-3 bg-white rounded-lg border-2 border-blue-200">
+                    <p className="text-sm font-semibold text-blue-700">
+                      {selectedPeople.length} {selectedPeople.length === 1 ? 'person' : 'people'} selected: {selectedPeople.join(', ')}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Status Selector */}
@@ -270,7 +317,7 @@ const WeekendModal = ({ date, onClose, weekendInterests, onUpdate }) => {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={!selectedPerson || saving}
+                disabled={selectedPeople.length === 0 || saving}
                 className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl touch-manipulation text-base flex items-center justify-center gap-2"
               >
                 {saving ? (
@@ -286,7 +333,7 @@ const WeekendModal = ({ date, onClose, weekendInterests, onUpdate }) => {
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
                     </svg>
-                    Add Interest
+                    Add {selectedPeople.length > 0 ? `${selectedPeople.length} ${selectedPeople.length === 1 ? 'Person' : 'People'}` : 'Interest'}
                   </>
                 )}
               </button>
