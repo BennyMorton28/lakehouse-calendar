@@ -100,7 +100,7 @@ function App() {
             Lake House Calendar
           </h1>
           <p className="text-gray-600 text-base md:text-lg font-medium">
-            Plan your family weekends at the lake ✨
+            Plan your family trips to the lake ✨
           </p>
         </div>
 

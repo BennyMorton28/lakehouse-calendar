@@ -107,18 +107,18 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
               relative min-h-[90px] md:min-h-[110px] p-3 md:p-4 rounded-xl
               transition-all duration-300 touch-manipulation overflow-hidden group
               ${isCurrentMonth ? 'bg-white shadow-sm' : 'bg-gray-50/50'}
-              ${isWeekendDay && isCurrentMonth ? 'cursor-pointer hover:shadow-xl hover:scale-[1.03] hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50' : 'cursor-default'}
+              ${isCurrentMonth ? 'cursor-pointer hover:shadow-xl hover:scale-[1.03] hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50' : 'cursor-default'}
               ${isToday ? 'ring-2 ring-blue-500 shadow-lg' : ''}
               ${!isCurrentMonth ? 'opacity-40' : ''}
             `}
             onClick={() => {
-              if (isWeekendDay && isCurrentMonth) {
+              if (isCurrentMonth) {
                 onWeekendClick(cloneDay)
               }
             }}
           >
-            {/* Subtle gradient overlay for weekends */}
-            {isWeekendDay && isCurrentMonth && (
+            {/* Subtle gradient overlay */}
+            {isCurrentMonth && (
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             )}
 
@@ -138,7 +138,7 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
                 )}
               </div>
 
-              {isWeekendDay && isCurrentMonth && totalInterest > 0 && (
+              {isCurrentMonth && totalInterest > 0 && (
                 <div className="flex-1 flex flex-col gap-2">
                   {/* Interest indicators */}
                   <div className="flex flex-wrap gap-1.5">

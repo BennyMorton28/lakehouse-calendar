@@ -107,7 +107,7 @@ const WeekendModal = ({ date, onClose, weekendInterests, onUpdate }) => {
                   </svg>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold">
-                  Weekend Plans
+                  Lake House Plans
                 </h2>
               </div>
               <p className="text-blue-100 text-base md:text-lg font-medium">
