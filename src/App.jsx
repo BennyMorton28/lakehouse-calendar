@@ -76,7 +76,7 @@ function App() {
         <div className="animate-pulse">
           <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl mb-4"></div>
         </div>
-        <div className="text-lg font-semibold text-gray-700">Loading your calendar...</div>
+        <div className="text-lg font-semibold text-gray-700">Loading Camp Morton...</div>
       </div>
     )
   }
@@ -97,7 +97,7 @@ function App() {
             </svg>
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-3">
-            Lake House Calendar
+            Camp Morton
           </h1>
         </div>
 
