@@ -97,7 +97,7 @@ function App() {
             </svg>
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-3">
-            Camp Morton
+            Camp Morton Calendar
           </h1>
         </div>
 
