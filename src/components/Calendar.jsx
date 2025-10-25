@@ -104,7 +104,7 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
           <div
             key={day}
             className={`
-              relative min-h-[90px] md:min-h-[110px] p-3 md:p-4 rounded-xl
+              relative h-[90px] md:h-[110px] p-2 md:p-4 rounded-xl
               transition-all duration-300 touch-manipulation overflow-hidden group
               ${isCurrentMonth ? 'bg-white shadow-sm' : 'bg-gray-50/50'}
               ${isCurrentMonth ? 'cursor-pointer hover:shadow-xl hover:scale-[1.03] hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50' : 'cursor-default'}
@@ -123,7 +123,7 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
             )}
 
             <div className="relative flex flex-col h-full">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-1">
                 <span className={`
                   text-base md:text-lg font-bold
                   ${!isCurrentMonth ? 'text-gray-400' : isToday ? 'text-blue-600' : 'text-gray-800'}
@@ -132,57 +132,53 @@ const Calendar = ({ currentMonth, onMonthChange, onWeekendClick, weekendInterest
                 </span>
 
                 {isToday && (
-                  <span className="px-2 py-0.5 text-xs font-bold text-white bg-blue-500 rounded-full">
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-blue-500 rounded-full">
                     Today
                   </span>
                 )}
               </div>
 
               {isCurrentMonth && totalInterest > 0 && (
-                <div className="flex-1 flex flex-col gap-2">
-                  {/* Interest indicators */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {interests.slice(0, 4).map((interest, idx) => {
+                <div className="flex-1 flex flex-col justify-between">
+                  {/* Interest indicators - max 3 avatars on mobile, 4 on desktop */}
+                  <div className="flex items-center gap-1">
+                    {interests.slice(0, 3).map((interest, idx) => {
                       const member = FAMILY_MEMBERS.find(m => m.name === interest.person_name)
                       return (
                         <div
                           key={idx}
-                          className="relative w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md hover:scale-110 transition-transform"
-                          style={{ backgroundColor: member?.color || '#gray' }}
+                          className="relative flex-shrink-0"
                           title={`${interest.person_name} - ${interest.status}`}
                         >
-                          {interest.person_name[0]}
+                          <div
+                            className="w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-sm"
+                            style={{ backgroundColor: member?.color || '#gray' }}
+                          >
+                            {interest.person_name[0]}
+                          </div>
                           {interest.status === 'confirmed' && (
-                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white">
-                              <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            </div>
+                            <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-white"></div>
                           )}
                         </div>
                       )
                     })}
-                    {interests.length > 4 && (
-                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white text-xs font-bold shadow-md">
-                        +{interests.length - 4}
+                    {interests.length > 3 && (
+                      <div className="w-6 h-6 md:w-7 md:h-7 flex-shrink-0 rounded-full bg-gray-700 flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-sm">
+                        +{interests.length - 3}
                       </div>
                     )}
                   </div>
 
-                  {/* Status summary bar */}
-                  <div className="flex items-center gap-2 mt-auto">
+                  {/* Status summary - compact */}
+                  <div className="flex items-center gap-1.5 text-[10px] md:text-xs">
                     {confirmedCount > 0 && (
-                      <div className="flex items-center gap-1 px-2 py-1 bg-green-100 rounded-lg">
-                        <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-xs font-bold text-green-700">{confirmedCount}</span>
+                      <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-green-100 rounded">
+                        <span className="font-bold text-green-700">✓{confirmedCount}</span>
                       </div>
                     )}
                     {tentativeCount > 0 && (
-                      <div className="flex items-center gap-1 px-2 py-1 bg-amber-100 rounded-lg">
-                        <span className="text-xs font-bold text-amber-700">?</span>
-                        <span className="text-xs font-bold text-amber-700">{tentativeCount}</span>
+                      <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-100 rounded">
+                        <span className="font-bold text-amber-700">?{tentativeCount}</span>
                       </div>
                     )}
                   </div>
